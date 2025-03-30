@@ -1,0 +1,11 @@
+[Unit]
+[Unit]
+Description=Run transit display clear
+
+[Timer]
+OnCalendar=*-*-* *:*:30
+AccuracySec=1
+
+[Install]
+WantedBy=timers.target
+

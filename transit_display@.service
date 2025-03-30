@@ -1,0 +1,12 @@
+[Unit]
+Description=Pull data, update display
+After=local-fs.target network.target
+
+[Service]
+WorkingDirectory=/home/tnagy/transit-epaper/
+ExecStart=/bin/bash -ac '. ../.appsecrets; exec python3 transit.py %I'
+User=tnagy
+
+[Install]
+WantedBy=multi-user.target
+

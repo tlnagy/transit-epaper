@@ -1,0 +1,13 @@
+[Unit]
+Description=Run transit display update
+
+[Timer]
+OnCalendar=Mon..Fri 07:30..59:00
+OnCalendar=Mon..Fri 08:00..59:00
+OnCalendar=Mon..Fri 09:00..59:00
+OnCalendar=Mon..Fri 10:00..29:00
+AccuracySec=1
+
+[Install]
+WantedBy=timers.target
+
