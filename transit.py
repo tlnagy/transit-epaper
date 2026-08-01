@@ -8,11 +8,6 @@ args = sys.argv
 
 logging.basicConfig(level=logging.INFO)
 
-logging.info("Called with arguments {}".format(args))
-if len(args) < 2 or args[1] != 'update':
-    if not os.path.isfile("upcoming.json"):
-        logging.info("No update flag and no upcoming.json, aborting...")
-        exit()
 
 # path to ePaper library
 filedir = os.path.dirname(os.path.realpath(__file__))
@@ -23,11 +18,36 @@ if os.path.exists(libdir):
 
 from waveshare_epd import epd4in26
 import time
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
 # CONSTANTS
 PULL_FREQ_S = 180
 
+logging.info("Called with arguments {}".format(args))
+if len(args) < 2 or args[1] != 'update':
+    if not os.path.isfile("upcoming.json"):
+        logging.info("No update flag and no upcoming.json, updating time...")
+
+        try: 
+            epd = epd4in26.EPD()
+            logging.info("Initialize display")
+            epd.init_Fast()
+            bigfont = ImageFont.truetype(os.path.join(filedir, 'NotoSans.ttf'), 200)
+            img = Image.new('1', (epd.width, epd.height), 255)
+            draw = ImageDraw.Draw(img)
+
+            bus = Image.open('bus.png')
+
+            img.paste(bus, (0,0))
+
+            message = time.strftime('%H:%M')
+            _, _, w, h = draw.textbbox((0, 0), message, font=bigfont, align="right", stroke_width = 2)
+            draw.text((epd.width - w - 50, epd.height - h - 50), message, font = bigfont, fill = 0, stroke_width = 2, stroke_fill = 0)
+
+            epd.display_Fast(epd.getbuffer(img))
+            logging.info("Removing stale upcoming.json")
+        finally:
+            exit()
 
 
 try:
@@ -54,8 +74,8 @@ try:
             draw = ImageDraw.Draw(img)
 
             bus = Image.open('bus.png')
-
             img.paste(bus, (300,150))
+
             epd.display_Fast(epd.getbuffer(img))
             logging.info("Removing stale upcoming.json")
             os.remove("upcoming.json")
